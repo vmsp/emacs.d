@@ -190,6 +190,17 @@
 (bind-key* "C-x m" 'eshell)
 (bind-key* "C-x M" 'vsp/new-eshell)
 
+;;; Delete superfluous whitespace when saving.
+
+(defun vsp/delete-trailing-whitespace ()
+  "Delete trailing whitespace on the whole buffer, except the
+currently selected line."
+  (interactive)
+  (delete-trailing-whitespace (point-min) (line-beginning-position))
+  (delete-trailing-whitespace (line-end-position) (point-max)))
+
+(add-hook 'before-save-hook #'vsp/delete-trailing-whitespace)
+
 ;; Use CMD as meta on macOS. Option is used to insert all sorts of characters.
 (setq ns-command-modifier 'meta
       ns-option-modifier 'none
@@ -366,4 +377,3 @@
   ;; Setup completion at point.
   (defun tempel-setup-capf ()
     (add-hook 'completion-at-point-functions #'tempel-expand -1 'local)))
-
