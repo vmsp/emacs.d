@@ -1,0 +1,7 @@
+;; -*- mode: lisp -*-
+
+web-mode :condition (string= (file-name-extension (buffer-file-name)) "erb")
+
+(er "<% " p " %>")
+(pe "<%= " p " %>")
+(end "<% end %>")
