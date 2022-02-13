@@ -352,7 +352,17 @@ currently selected line."
   (add-hook 'web-mode-hook 'vsp/web-mode-hook))
 
 (use-package emmet-mode
-  :hook web-mode)
+  :commands emmet-transform
+  :hook (web-mode . vsp/emmet-setup-capf)
+  :init
+  (defun vsp/emmet-expand ()
+    (let ((bounds (bounds-of-thing-at-point 'symbol)))
+      (list (car bounds) (cdr bounds)
+            (lambda (str pred action) (emmet-transform str))
+            :exclusive 'no)))
+
+  (defun vsp/emmet-setup-capf ()
+    (add-hook 'completion-at-point-functions 'vsp/emmet-expand 0 'local)))
 
 ;;; Completion at point UI
 
@@ -372,8 +382,8 @@ currently selected line."
          ("TAB" . tempel-next)
          ("S-TAB" . tempel-previous)
          ("C-g" . tempel-done))
-  :hook ((prog-mode text-mode) . tempel-setup-capf)
+  :hook ((prog-mode text-mode) . vsp/tempel-setup-capf)
   :init
   ;; Setup completion at point.
-  (defun tempel-setup-capf ()
+  (defun vsp/tempel-setup-capf ()
     (add-hook 'completion-at-point-functions #'tempel-expand -1 'local)))
