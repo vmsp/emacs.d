@@ -280,7 +280,9 @@ currently selected line."
          :map treemacs-mode-map
               ([mouse-1] . treemacs-single-click-expand-action))
   :custom
-  (treemacs-no-png-images t))
+  (treemacs-no-png-images t)
+  :config
+  (treemacs-project-follow-mode t))
 
 (use-package dash-at-point
   :if (eq system-type 'darwin)
