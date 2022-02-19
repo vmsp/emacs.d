@@ -352,22 +352,18 @@ currently selected line."
   (add-hook 'web-mode-hook 'vsp/web-mode-hook))
 
 (use-package emmet-mode
-  :commands emmet-transform
+  :commands emmet-expand-line
   :hook (web-mode . vsp/emmet-setup-capf)
   :init
-  (defun vsp/emmet-expand ()
-    (let ((bounds (bounds-of-thing-at-point 'symbol)))
-      (list (car bounds) (cdr bounds)
-            (lambda (str pred action) (emmet-transform str))
-            :exclusive 'no)))
-
   (defun vsp/emmet-setup-capf ()
-    (add-hook 'completion-at-point-functions 'vsp/emmet-expand 0 'local)))
+    (add-hook 'completion-at-point-functions
+              (lambda () (emmet-expand-line nil))
+              0
+              'local)))
 
 ;;; Completion at point UI
 
 (use-package corfu
-  :init
   :hook (prog-mode . corfu-mode))
 
 ;; Enable indentation and completion using TAB.
