@@ -16,7 +16,8 @@
 
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
-;; Install use-package. It will load up all other packages.
+;;; Install use-package. It will load up all other packages.
+
 (package-initialize t)
 
 (unless (package-installed-p 'use-package)
@@ -38,12 +39,6 @@
 ;; Make *scratch* buffer use fundamental instead of elisp mode.
 (setq initial-major-mode 'fundamental-mode
       initial-scratch-message nil)
-
-;; Make scrolling slightly better on macOS.
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1))
-      mouse-wheel-progressive-speed nil
-      mouse-wheel-follow-mouse 't
-      scroll-step 1)
 
 (setq-default indent-tabs-mode nil
               ;; Make it so a single space ends a sentence when filling.
@@ -114,6 +109,7 @@
 (add-hook 'after-save-hook
       	  'executable-make-buffer-file-executable-if-script-p)
 
+;; Set registers, for quick file access.
 (set-register ?i '(file . "~/.emacs.d/init.el"))
 (set-register ?t '(file . "~/.emacs.d/templates"))
 
@@ -177,6 +173,7 @@
 (global-unset-key [C-wheel-up])
 (global-unset-key [C-wheel-down])
 
+;; (bind-key* "C-u C-x C-f" 'find-file-other-window)
 (bind-key* "C-x C-b" 'ibuffer)
 (bind-key* "C-x TAB" 'imenu)
 (bind-key* "C--" 'undo)
@@ -201,21 +198,22 @@ currently selected line."
 
 (add-hook 'before-save-hook #'vsp/delete-trailing-whitespace)
 
-;; Use CMD as meta on macOS. Option is used to insert all sorts of characters.
+;; Use CMD as meta on both Cocoa and Mitsuharu builds. Option is used to insert
+;; all sorts of characters.
 (setq ns-command-modifier 'meta
       ns-option-modifier 'none
       ns-pop-up-frames nil)
 
-(use-package display-line-numbers
-  :ensure nil
-  :hook ((prog-mode text-mode) . display-line-numbers-mode)
-  :custom
-  (line-numbers-width-start t)
-  (display-line-numbers-grow-only t))
+;; (use-package display-line-numbers
+;;   :ensure nil
+;;   :hook (prog-mode . display-line-numbers-mode)
+;;   :custom
+;;   (line-numbers-width-start t)
+;;   (display-line-numbers-grow-only t))
 
 (use-package display-fill-column-indicator
   :ensure nil
-  :hook ((prog-mode text-mode) . display-fill-column-indicator-mode))
+  :hook ((prog-mode) . display-fill-column-indicator-mode))
 
 (use-package nord-theme
   :config (load-theme 'nord t))
@@ -307,15 +305,16 @@ currently selected line."
   :ensure nil
   :mode "\\.h\\'")
 
+(use-package objc-mode
+  :ensure nil
+  :mode "\\.mm\\'")
+
 (use-package google-c-style
   :load-path "~/.emacs.d/vendor/"
   :hook (c-mode-common . google-set-c-style))
 
 (use-package cider
   :commands cider-jack-in)
-
-(use-package markdown-mode
-  :mode "\\.md\\'")
 
 (use-package js
   :ensure nil
@@ -363,10 +362,43 @@ currently selected line."
               0
               'local)))
 
+;;; Writing
+
+(use-package org
+  :ensure t
+  :pin gnu
+  :mode ("\\.org\\'" . org-mode)
+  :bind (("C-c c" . org-capture)
+         :map org-mode-map
+         ("C-c b" . org-cite-insert))
+  :custom
+  (org-capture-templates
+   '(("f" "Favorito" entry (file "~/Documents/Org/Favoritos.org")
+      "* TODO %:annotation %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n"
+      :prepend t))))
+
+(use-package markdown-mode
+  :mode "\\.md\\'")
+
+;; (use-package aggressive-fill-paragraph
+;;   ;; Better version of auto-fill-mode that automatically fills the paragraph
+;;   ;; when a space is inserted.
+;;   :hook (text-mode . aggressive-fill-paragraph-mode))
+
+(use-package flyspell
+  ;; On macOS, Hunspell dictionaries live in `~/Library/Spelling/'.
+  ;;
+  ;; Portuguese dictionaries can be downloaded at
+  ;; https://natura.di.uminho.pt/wiki/doku.php?id=dicionarios:main
+  :ensure nil
+  :hook (org-mode . flyspell-mode)
+  :custom
+  (ispell-really-hunspell t))
+
 ;;; Completion at point UI
 
 (use-package corfu
-  :hook (prog-mode . corfu-mode))
+  :hook ((prog-mode org-mode) . corfu-mode))
 
 ;; Enable indentation and completion using TAB.
 (setq tab-always-indent 'complete)
