@@ -5,6 +5,9 @@
 ;; Adjust garbage collection settings so hangs are less frequent.
 (require 'hm-gc-settings)
 
+;; Set my name. Used by org export and mail packages.
+(setq user-full-name "Vitor M. de Sousa Pereira")
+
 ;; Turn off unneeded GUI things. These settings should be preferably set using
 ;; `defaults', as setting them here slows down startup considerably.
 (when (fboundp 'tool-bar-mode)
@@ -179,6 +182,7 @@
 (bind-key* "C-x C-b" 'ibuffer)
 (bind-key* "C-x TAB" 'imenu)
 (bind-key* "C--" 'undo)
+(bind-key* "M-z" 'undo)
 (bind-key* "C-x k" 'kill-this-buffer)
 (bind-key* "M-o" 'other-window)
 (bind-key* "C-x o" 'ff-find-other-file)
@@ -319,10 +323,10 @@
 (use-package web-mode
   :mode ("\\.html\\'" "\\.html.erb\\'" "\\.html.dtl\\'")
   :custom
-  (web-mode-markup-indent-offset 2)
-  (web-mode-css-indent-offset 2)
   (web-mode-code-indent-offset 2)
   (web-mode-comment-style 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-markup-indent-offset 2)
   (web-mode-script-padding 2)
   (web-mode-style-padding 2)
   :init
@@ -383,11 +387,16 @@
          :map org-mode-map
          ("C-c b" . org-cite-insert))
   :custom
-  (org-startup-folded t)
   (org-capture-templates
-   '(("f" "Favorito" entry (file "~/Documents/Org/Favoritos.org")
-      "* TODO %:annotation%?\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n"
-      :prepend t))))
+   '(("f" "Favorito" entry (file "~/Documents/Favoritos.org")
+      "* TODO %:annotation%?\n:PROPERTIES:\n:ADDED: %U\n:END:\n\n"
+      :prepend t)))
+  (org-html-doctype "html5")
+  (org-html-validation-link nil)
+  (org-startup-folded t))
+
+;; (use-package org-modern
+;;   :hook (org-mode . org-modern-mode))
 
 (use-package markdown-mode
   :mode "\\.md\\'")
@@ -397,14 +406,17 @@
   :hook (text-mode . auto-fill-mode))
 
 (use-package flyspell
-  ;; On macOS, Hunspell dictionaries live in `~/Library/Spelling/'.
-  ;;
   ;; Portuguese dictionaries can be downloaded at
   ;; https://natura.di.uminho.pt/wiki/doku.php?id=dicionarios:main
   :ensure nil
-  :hook (text-mode . flyspell-mode)
+  :hook ((text-mode . flyspell-mode)
+         (text-mode . flyspell-buffer))
   :custom
-  (ispell-really-hunspell t))
+  (ispell-really-aspell t))
+
+(use-package flyspell-correct
+  :bind (:map flyspell-mode-map
+              ("C-;" . flyspell-correct-wrapper)))
 
 (use-package server
   ;; Start a server by default so that org-protocol links work.
