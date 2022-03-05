@@ -430,3 +430,4 @@
 ;;   :hook emacs-lisp-mode
 ;;   :custom
 ;;   (elisp-flymake-byte-compile-load-path load-path))
+;;; init.el ends here

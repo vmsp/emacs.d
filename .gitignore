@@ -1,0 +1,7 @@
+/*
+*.elc
+
+!.gitignore
+!init.el
+!templates
+!vendor/
