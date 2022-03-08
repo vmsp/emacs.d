@@ -281,7 +281,7 @@
   :bind ("C-c d" . dash-at-point))
 
 (use-package cmake-mode
-  :defer t)
+  :load-path "/usr/local/share/emacs/site-lisp/cmake/")
 
 (use-package yaml-mode
   :mode "\\.yml\\'")
@@ -431,6 +431,22 @@
   :bind (:map flyspell-mode-map
               ("C-;" . flyspell-correct-wrapper)))
 
+(use-package guess-language
+  ;; Guess the language that's being used in the sentece.
+  :hook (flyspell-mode . guess-language-mode)
+  :custom
+  (guess-language-languages '(en pt))
+  (guess-language-min-paragraph-length 35))
+
+;; (use-package writegood-mode
+;;   :hook (flyspell-mode . writegood-mode))
+
+;; (use-package flymake
+;;   :defer nil
+;;   :hook emacs-lisp-mode
+;;   :custom
+;;   (elisp-flymake-byte-compile-load-path load-path))
+
 (use-package server
   ;; Start a server by default so that org-protocol links work.
   :ensure nil
@@ -438,9 +454,4 @@
   (unless (server-running-p)
     (server-start)))
 
-;; (use-package flymake
-;;   :defer nil
-;;   :hook emacs-lisp-mode
-;;   :custom
-;;   (elisp-flymake-byte-compile-load-path load-path))
 ;;; init.el ends here
