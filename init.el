@@ -295,6 +295,11 @@
   :mode "\\.fish\\'"
   :custom (fish-indent-offset 2))
 
+(use-package python
+  :mode "\\.py\\'"
+  :custom
+  (python-fill-docstring-style 'pep-257-nn))
+
 (use-package c++-mode
   :ensure nil
   :mode "\\.h\\'")
