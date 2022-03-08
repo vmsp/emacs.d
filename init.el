@@ -46,7 +46,7 @@
 (setq-default indent-tabs-mode nil
               ;; Make it so a single space ends a sentence when filling.
               sentence-end-double-space nil
-              fill-column 80)
+              fill-column 72)
 
 ;; Don't create emacs-specific files in the directory of the file that's being
 ;; edited.
@@ -205,7 +205,9 @@
 
 (use-package display-fill-column-indicator
   :ensure nil
-  :hook ((prog-mode) . display-fill-column-indicator-mode))
+  :hook ((prog-mode) . display-fill-column-indicator-mode)
+  :custom
+  (display-fill-column-indicator-column 80))
 
 (use-package nord-theme
   :config (load-theme 'nord t))
@@ -333,9 +335,9 @@
   (setq web-mode-engines-alist '(("liquid" . "\\.html\\'")))
   :config
   (defun vsp/web-mode-hook ()
-    (setq-local fill-column 100
-                ;; Don't pair curly braces in web-mode as it already has its
-                ;; own completions.
+    (setq-local display-fill-column-indicator-column 100
+                ;; Don't pair curly braces in web-mode as it already has
+                ;; its own completions.
                 electric-pair-inhibit-predicate
                 (lambda (c)
                   (if (char-equal c ?{)
