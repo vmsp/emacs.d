@@ -386,24 +386,31 @@
 
 ;;; Writing
 
+ (custom-theme-set-faces
+   'user
+   '(variable-pitch ((t (:family "IBM Plex Sans" :height 180)))))
+
 (use-package org
   :ensure t
   :pin gnu
   :mode ("\\.org\\'" . org-mode)
-  :bind (("C-c c" . org-capture)
+  :bind (("C-c l" . org-store-link)
+         ("C-c a" . org-agenda)
+         ("C-c c" . org-capture)
          :map org-mode-map
          ("C-c b" . org-cite-insert))
   :custom
+  (org-agenda-files '("~/Documents/Agenda.org"))
   (org-capture-templates
    '(("f" "Favorito" entry (file "~/Documents/Favoritos.org")
       "* TODO %:annotation%?\n:PROPERTIES:\n:ADDED: %U\n:END:\n\n"
-      :prepend t)))
+      :prepend t)
+     ("s" "Scratch" entry (file "~/Documents/Scratch.org")
+      "* %?\n\n")))
+  (org-export-time-stamp-file nil)
   (org-html-doctype "html5")
   (org-html-validation-link nil)
   (org-startup-folded t))
-
-;; (use-package org-modern
-;;   :hook (org-mode . org-modern-mode))
 
 (use-package markdown-mode
   :mode "\\.md\\'")
@@ -416,8 +423,7 @@
   ;; Portuguese dictionaries can be downloaded at
   ;; https://natura.di.uminho.pt/wiki/doku.php?id=dicionarios:main
   :ensure nil
-  :hook ((text-mode . flyspell-mode)
-         (text-mode . flyspell-buffer))
+  :hook ((text-mode . flyspell-mode))
   :custom
   (ispell-really-aspell t))
 
