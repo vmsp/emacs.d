@@ -17,7 +17,10 @@
 (when (fboundp 'horizontal-scroll-bar-mode)
   (horizontal-scroll-bar-mode 0))
 
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(setq package-archives
+      '(("melpa" . "https://melpa.org/packages/")
+        ("elpa" . "https://elpa.gnu.org/packages/")
+        ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
 
 ;;; Install use-package. It will load up all other packages.
 
@@ -269,7 +272,7 @@
 (use-package treemacs
   :bind (:map winum-keymap
               ("M-0" . treemacs-select-window)
-         :map treemacs-mode-map
+              :map treemacs-mode-map
               ([mouse-1] . treemacs-single-click-expand-action))
   :custom
   (treemacs-no-png-images t)
@@ -281,7 +284,12 @@
   :bind ("C-c d" . dash-at-point))
 
 (use-package cmake-mode
+  :defer t
   :load-path "/usr/local/share/emacs/site-lisp/cmake/")
+
+(use-package ninja-mode
+  :load-path "/usr/local/share/emacs/site-lisp/ninja/"
+  :mode "\\.ninja\\'")
 
 (use-package yaml-mode
   :mode "\\.yml\\'")
@@ -296,9 +304,13 @@
   :custom (fish-indent-offset 2))
 
 (use-package python
-  :mode "\\.py\\'"
+  :mode ("\\.py\\'" . python-mode)
   :custom
   (python-fill-docstring-style 'pep-257-nn))
+
+(use-package lua-mode
+  :mode "\\.lua\\'"
+  :custom (lua-indent-level 2))
 
 (use-package c++-mode
   :ensure nil
@@ -312,12 +324,25 @@
   :load-path "~/.emacs.d/vendor/"
   :hook (c-mode-common . google-set-c-style))
 
+(use-package slime
+  :commands slime
+  :hook (common-lisp-mode . slime-mode)
+  :init
+  (setq inferior-lisp-program "ccl64"
+        slime-contribs '(slime-fancy slime-asdf slime-quicklisp)))
+
+(use-package lispy
+  :hook (lisp-mode . lispy-mode))
+
 (use-package cider
   :commands cider-jack-in)
 
 (use-package js
   :ensure nil
   :defer t
+  :mode (("\\.js\\'" . js-mode)
+         ("\\.json\\'" . js-mode)
+         ("\\.webmanifest\\'" . js-mode))
   :custom
   (js-expr-indent-offset 2)
   (js-indent-level 2))
@@ -329,6 +354,7 @@
 
 (use-package web-mode
   :mode ("\\.html\\'" "\\.html.erb\\'" "\\.html.dtl\\'")
+  :hook (web-mode . vsp/web-mode-hook)
   :custom
   (web-mode-code-indent-offset 2)
   (web-mode-comment-style 2)
@@ -347,9 +373,7 @@
                 (lambda (c)
                   (if (char-equal c ?{)
                       t
-                    (electric-pair-default-inhibit c)))))
-
-  (add-hook 'web-mode-hook 'vsp/web-mode-hook))
+                    (electric-pair-default-inhibit c))))))
 
 (use-package emmet-mode
   :commands emmet-expand-line
@@ -386,13 +410,13 @@
 
 ;;; Writing
 
- (custom-theme-set-faces
-   'user
-   '(variable-pitch ((t (:family "IBM Plex Sans" :height 180)))))
+(custom-theme-set-faces
+ 'user
+ '(variable-pitch ((t (:family "IBM Plex Sans" :height 180)))))
 
 (use-package org
   :ensure t
-  :pin gnu
+  :pin elpa
   :mode ("\\.org\\'" . org-mode)
   :bind (("C-c l" . org-store-link)
          ("C-c a" . org-agenda)
@@ -410,6 +434,7 @@
   (org-export-time-stamp-file nil)
   (org-html-doctype "html5")
   (org-html-validation-link nil)
+  (org-startup-indented t)
   (org-startup-folded t))
 
 (use-package markdown-mode
@@ -437,9 +462,6 @@
   :custom
   (guess-language-languages '(en pt))
   (guess-language-min-paragraph-length 35))
-
-;; (use-package writegood-mode
-;;   :hook (flyspell-mode . writegood-mode))
 
 ;; (use-package flymake
 ;;   :defer nil
