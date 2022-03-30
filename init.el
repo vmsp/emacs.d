@@ -49,7 +49,7 @@
 (setq-default indent-tabs-mode nil
               ;; Make it so a single space ends a sentence when filling.
               sentence-end-double-space nil
-              fill-column 72)
+              fill-column 80)
 
 ;; Don't create emacs-specific files in the directory of the file that's being
 ;; edited.
@@ -208,9 +208,7 @@
 
 (use-package display-fill-column-indicator
   :ensure nil
-  :hook ((prog-mode) . display-fill-column-indicator-mode)
-  :custom
-  (display-fill-column-indicator-column 80))
+  :hook ((prog-mode) . display-fill-column-indicator-mode))
 
 (use-package nord-theme
   :config (load-theme 'nord t))
@@ -284,12 +282,17 @@
   :bind ("C-c d" . dash-at-point))
 
 (use-package cmake-mode
-  :defer t
-  :load-path "/usr/local/share/emacs/site-lisp/cmake/")
+  :load-path "/usr/local/share/emacs/site-lisp/cmake/"
+  :mode "CMakeLists.txt")
 
 (use-package ninja-mode
   :load-path "/usr/local/share/emacs/site-lisp/ninja/"
   :mode "\\.ninja\\'")
+
+(use-package bazel
+  :defer t
+  :hook (bazel-mode . flymake-mode)
+  :mode ("\\.BUILD\\'" . bazel-build-mode))
 
 (use-package yaml-mode
   :mode "\\.yml\\'")
@@ -314,7 +317,11 @@
 
 (use-package c++-mode
   :ensure nil
-  :mode "\\.h\\'")
+  :mode "\\.h\\'"
+  :bind (:map c++-mode-map
+              ("C-c C-c" . compile)
+              ("C-c C-b" . bazel-build)
+              ("C-c C-r" . bazel-run)))
 
 (use-package objc-mode
   :ensure nil
@@ -323,6 +330,19 @@
 (use-package google-c-style
   :load-path "~/.emacs.d/vendor/"
   :hook (c-mode-common . google-set-c-style))
+
+;; Ignore GCC generate header dependency files.
+(add-to-list 'completion-ignored-extensions ".d")
+
+(use-package clang-format
+  :load-path "/usr/local/opt/llvm/share/emacs/site-lisp/llvm"
+  :bind (:map c++-mode-map
+              ("C-c C-f" . clang-format-buffer)))
+
+(use-package go-mode
+  :mode (("\\.go\\'" . go-mode)
+         ("go\\.mod\\'" . go-dot-mod-mode))
+  :hook (go-mode . eglot-ensure))
 
 (use-package slime
   :commands slime
@@ -341,8 +361,7 @@
   :ensure nil
   :defer t
   :mode (("\\.js\\'" . js-mode)
-         ("\\.json\\'" . js-mode)
-         ("\\.webmanifest\\'" . js-mode))
+         ("\\.json\\'" . js-mode))
   :custom
   (js-expr-indent-offset 2)
   (js-indent-level 2))
@@ -384,6 +403,13 @@
               (lambda () (emmet-expand-line nil))
               0
               'local)))
+
+(use-package eglot
+  ;; Language Server Protocol client for Emacs.
+  :commands (eglot eglot-ensure)
+  :bind (:map eglot-mode-map
+              ("C-c r" . eglot-rename)
+              ("C-c o" . eglot-code-action-organize-imports)))
 
 ;;; Completion at point UI
 
@@ -427,7 +453,7 @@
   (org-agenda-files '("~/Documents/Agenda.org"))
   (org-capture-templates
    '(("f" "Favorito" entry (file "~/Documents/Favoritos.org")
-      "* TODO %:annotation%?\n:PROPERTIES:\n:ADDED: %U\n:END:\n\n"
+      "\n* TODO %:annotation%?\n:PROPERTIES:\n:ADDED: %U\n:END:\n\n"
       :prepend t)
      ("s" "Scratch" entry (file "~/Documents/Scratch.org")
       "* %?\n\n")))
