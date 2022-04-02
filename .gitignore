@@ -2,6 +2,7 @@
 *.elc
 
 !.gitignore
+!early-init.el
 !init.el
 !templates
 !vendor/

@@ -1,10 +1,5 @@
 ;;; init.el --- Vitor's .emacs file  -*- lexical-binding: t -*-
 
-(add-to-list 'load-path "~/.emacs.d/vendor/")
-
-;; Adjust garbage collection settings so hangs are less frequent.
-(require 'hm-gc-settings)
-
 ;; Set my name. Used by org export and mail packages.
 (setq user-full-name "Vitor M. de Sousa Pereira")
 
@@ -17,14 +12,14 @@
 (when (fboundp 'horizontal-scroll-bar-mode)
   (horizontal-scroll-bar-mode 0))
 
-(setq package-archives
-      '(("melpa" . "https://melpa.org/packages/")
-        ("elpa" . "https://elpa.gnu.org/packages/")
-        ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
+;; Archives where packages will be downloaded from.
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")
+                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
 
 ;;; Install use-package. It will load up all other packages.
 
-(package-initialize t)
+(package-initialize)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -62,8 +57,9 @@
       backup-by-copying t)
 
 (setq
- ;; Always load up most recent file.
- load-prefer-newer t
+ ;; Always `load' most recent elisp file. Useful when byte compiled files are
+ ;; not up to date.
+ load-prefer-newer noninteractive
  ;; Copy from point, instead of click, when using a mouse.
  mouse-yank-at-point t
  ;; Always add a final newline to all files.
@@ -85,16 +81,6 @@
 (load custom-file t)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
-
-;; Use UTF-8 everywhere.
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-(set-file-name-coding-system 'utf-8)
-(set-clipboard-coding-system 'utf-8)
-(set-buffer-file-coding-system 'utf-8)
 
 ;; Turn on/off some minor modes globally.
 (save-place-mode 1)
