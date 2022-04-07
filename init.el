@@ -328,7 +328,11 @@
 (use-package go-mode
   :mode (("\\.go\\'" . go-mode)
          ("go\\.mod\\'" . go-dot-mod-mode))
-  :hook (go-mode . eglot-ensure))
+  :hook ((go-mode . eglot-ensure)
+         (go-mode . vsp/go-mode-hook))
+  :config
+  (defun vsp/go-mode-hook ()
+    (display-fill-column-indicator-mode 0)))
 
 (use-package slime
   :commands slime
@@ -394,7 +398,8 @@
   ;; Language Server Protocol client for Emacs.
   :commands (eglot eglot-ensure)
   :bind (:map eglot-mode-map
-              ("C-c r" . eglot-rename)
+              ("C-c C-r" . eglot-rename)
+              ("C-c C-f" . eglot-format)
               ("C-c o" . eglot-code-action-organize-imports)))
 
 ;;; Completion at point UI
