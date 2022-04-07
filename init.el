@@ -33,6 +33,9 @@
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
 
+;; Native compile packages as part of their installation.
+(setq package-native-compile t)
+
 ;; Turn off startup message.
 (setq inhibit-startup-message t
       inhibit-startup-echo-area-message (user-login-name))
@@ -67,7 +70,13 @@
  ;; Save existing clipboard text into kill ring before replacing it.
  save-interprogram-paste-before-kill t
  ;; Use forward slashes when uniquifying buffer names.
- uniquify-buffer-name-style 'forward)
+ uniquify-buffer-name-style 'forward
+ ;; Use y/n instead of yes/no.
+ use-short-answers t
+ ;; Highlight current error message.
+ next-error-message-highlight t
+ ;; Don't use VC mode
+ vc-handled-backends nil)
 
 ;; Open ediff's buffers in a single frame.
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
@@ -79,8 +88,6 @@
 ;; Load custom.el if it exists.
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file t)
-
-(defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; Turn on/off some minor modes globally.
 (save-place-mode 1)
@@ -247,7 +254,9 @@
 (use-package dired
   :ensure nil
   :defer t
-  :custom (dired-dwim-target t)
+  :custom
+  (dired-dwim-target t)
+  (dired-kill-when-opening-new-dired-buffer t)
   :hook (dired-mode . dired-hide-details-mode))
 
 (use-package dired-x
@@ -376,8 +385,8 @@
   :config
   (defun vsp/web-mode-hook ()
     (setq-local display-fill-column-indicator-column 100
-                ;; Don't pair curly braces in web-mode as it already has
-                ;; its own completions.
+                ;; Don't pair curly braces in web-mode as it already has its own
+                ;; completions.
                 electric-pair-inhibit-predicate
                 (lambda (c)
                   (if (char-equal c ?{)
@@ -487,7 +496,8 @@
 ;;   (elisp-flymake-byte-compile-load-path load-path))
 
 (use-package server
-  ;; Start a server by default so that org-protocol links work.
+  ;; Start a server by default so that org-protocol links work. On macOS, only
+  ;; mituharu's fork registers a handler for org-protocol.
   :ensure nil
   :config
   (unless (server-running-p)
