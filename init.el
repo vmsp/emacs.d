@@ -62,7 +62,7 @@
 (setq
  ;; Always `load' most recent elisp file. Useful when byte compiled files are
  ;; not up to date.
- load-prefer-newer noninteractive
+ load-prefer-newer t
  ;; Copy from point, instead of click, when using a mouse.
  mouse-yank-at-point t
  ;; Always add a final newline to all files.
@@ -74,9 +74,7 @@
  ;; Use y/n instead of yes/no.
  use-short-answers t
  ;; Highlight current error message.
- next-error-message-highlight t
- ;; Don't use VC mode
- vc-handled-backends nil)
+ next-error-message-highlight t)
 
 ;; Open ediff's buffers in a single frame.
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
@@ -172,9 +170,6 @@
 
 ;;; Global keybinds. These won't be overriden on any mode.
 
-(global-unset-key [C-wheel-up])
-(global-unset-key [C-wheel-down])
-
 (bind-key* "C-x C-b" 'ibuffer)
 (bind-key* "C-x TAB" 'imenu)
 (bind-key* "C--" 'undo)
@@ -183,17 +178,20 @@
 (bind-key* "M-o" 'other-window)
 (bind-key* "C-x o" 'ff-find-other-file)
 
-(bind-key* "M-RET" 'project-find-file)
-(bind-key* "M-s s" 'project-find-regexp)
-
-(bind-key* "C-x m" 'eshell)
-(bind-key* "C-x M" 'vsp/new-eshell)
-
 ;; Use CMD as meta on both Cocoa and Mitsuharu builds. Option is used to insert
 ;; all sorts of characters.
 (setq ns-command-modifier 'meta
       ns-option-modifier 'none
       ns-pop-up-frames nil)
+
+(use-package eshell
+  :bind ("C-x m" . eshell))
+
+(use-package project
+  ;; Emacs' built-in projectile-ish mode. Default prefix is C-x p.
+  :ensure nil
+  :bind (("M-RET" . project-find-file)
+         ("M-s s" . project-find-regexp)))
 
 (use-package ws-butler
   ;; Trim whitespace without touching the point.
@@ -269,7 +267,7 @@
               ([mouse-1] . treemacs-single-click-expand-action))
   :custom
   (treemacs-no-png-images t)
-  :config
+  (treemacs-display-current-project-exclusively t)
   (treemacs-project-follow-mode t))
 
 (use-package dash-at-point
@@ -334,6 +332,10 @@
   :bind (:map c++-mode-map
               ("C-c C-f" . clang-format-buffer)))
 
+(use-package php-mode
+  :mode "\\.php\\'"
+  :custom (php-mode-template-compatibility nil))
+
 (use-package go-mode
   :mode (("\\.go\\'" . go-mode)
          ("go\\.mod\\'" . go-dot-mod-mode))
@@ -347,7 +349,7 @@
   :commands slime
   :hook (common-lisp-mode . slime-mode)
   :init
-  (setq inferior-lisp-program "ccl64"
+  (setq inferior-lisp-program "sbcl"
         slime-contribs '(slime-fancy slime-asdf slime-quicklisp)))
 
 (use-package lispy
@@ -488,12 +490,6 @@
   :custom
   (guess-language-languages '(en pt))
   (guess-language-min-paragraph-length 35))
-
-;; (use-package flymake
-;;   :defer nil
-;;   :hook emacs-lisp-mode
-;;   :custom
-;;   (elisp-flymake-byte-compile-load-path load-path))
 
 (use-package server
   ;; Start a server by default so that org-protocol links work. On macOS, only
