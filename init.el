@@ -1,5 +1,9 @@
 ;;; init.el --- Vitor's .emacs file  -*- lexical-binding: t -*-
 
+;; Make startup faster by reducing the frequency of garbage collection. The
+;; default is 800 kilobytes. Measured in bytes.
+(setq gc-cons-threshold (* 50 1000 1000))
+
 ;; Set my name. Used by org export and mail packages.
 (setq user-full-name "Vitor M. de Sousa Pereira")
 
@@ -498,5 +502,8 @@
   :config
   (unless (server-running-p)
     (server-start)))
+
+;; Make gc pauses faster by decreasing the threshold.
+(setq gc-cons-threshold (* 2 1000 1000))
 
 ;;; init.el ends here

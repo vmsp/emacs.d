@@ -1,10 +1,6 @@
 ;;; early-init.el --- Executes before init.el  -*- lexical-binding: t -*-
 
 (add-to-list 'load-path "~/.emacs.d/vendor/")
-
-;; Adjust garbage collection settings so hangs are less frequent.
-(require 'hm-gc-settings)
-
 ;; (package-initialize) is called later, so don't load up packages by default.
 (setq package-enable-at-startup nil)
 
