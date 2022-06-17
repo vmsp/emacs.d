@@ -222,6 +222,7 @@
   :config (whole-line-or-region-global-mode 1))
 
 (use-package ctrlf
+  :defer 1
   :config (ctrlf-mode 1))
 
 (use-package winum
@@ -262,6 +263,7 @@
   :hook (dired-mode . dired-hide-details-mode))
 
 (use-package dired-x
+  :after dired
   :ensure nil)
 
 (use-package treemacs
@@ -307,6 +309,10 @@
   :mode ("\\.py\\'" . python-mode)
   :custom
   (python-fill-docstring-style 'pep-257-nn))
+
+(use-package anaconda-mode
+  :hook ((python-mode . anaconda-mode)
+         (python-mode . anaconda-eldoc-mode)))
 
 (use-package lua-mode
   :mode "\\.lua\\'"
@@ -422,6 +428,9 @@
 (use-package corfu
   :hook ((prog-mode org-mode) . corfu-mode))
 
+;; Hide commands that don't apply to the current mode.
+(setq read-extended-command-predicate #'command-completion-default-include-p)
+
 ;; Enable indentation and completion using TAB.
 (setq tab-always-indent 'complete)
 
@@ -494,6 +503,11 @@
   :custom
   (guess-language-languages '(en pt))
   (guess-language-min-paragraph-length 35))
+
+(use-package esup
+  ;; Benchmark Emacs Startup time without ever leaving your Emacs.
+  :commands esup
+  :ensure t)
 
 (use-package server
   ;; Start a server by default so that org-protocol links work. On macOS, only
