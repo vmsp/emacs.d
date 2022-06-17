@@ -240,11 +240,6 @@
 (use-package magit
   :bind ("C-x g" . magit))
 
-(use-package exec-path-from-shell
-  ;; Load up correct $PATH on macOS.
-  :if (memq window-system '(mac ns))
-  :config (exec-path-from-shell-initialize))
-
 (use-package ls-lisp
   ;; Use an Emacs provided `ls', instead of the system's, so behavior is
   ;; consistent across all platforms.
