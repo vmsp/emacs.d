@@ -237,6 +237,16 @@
               ("M-8" . winum-select-window-8))
   :init (winum-mode 1))
 
+;; I only use git.
+(setq vc-handled-backends '(Git))
+
+(use-package vc-defer
+  ;; Defer non-essential work related to the built in VC mode. VC mode is used
+  ;; in `project-find-file'.
+  :config
+  (add-to-list 'vc-defer-backends 'Git)
+  (vc-defer-mode))
+
 (use-package magit
   :bind ("C-x g" . magit))
 
@@ -337,10 +347,6 @@
   :bind (:map c++-mode-map
               ("C-c C-f" . clang-format-buffer)))
 
-(use-package php-mode
-  :mode "\\.php\\'"
-  :custom (php-mode-template-compatibility nil))
-
 (use-package go-mode
   :mode (("\\.go\\'" . go-mode)
          ("go\\.mod\\'" . go-dot-mod-mode))
@@ -363,6 +369,13 @@
 (use-package cider
   :commands cider-jack-in)
 
+(use-package elixir-mode
+  :mode "\\.ex[s]\\'"
+  :hook (elixir-mode . vsp/elixir-mode-hook)
+  :config
+  (defun vsp/elixir-mode-hook ()
+    (add-hook 'before-save-hook 'elixir-format nil t)))
+
 (use-package js
   :ensure nil
   :defer t
@@ -378,7 +391,7 @@
   :custom (css-indent-offset 2))
 
 (use-package web-mode
-  :mode ("\\.html\\'" "\\.html.erb\\'" "\\.html.dtl\\'")
+  :mode ("\\.html\\'" "\\.erb\\'" "\\.dtl\\'" "\\.h?eex\\'")
   :hook (web-mode . vsp/web-mode-hook)
   :custom
   (web-mode-code-indent-offset 2)
@@ -388,7 +401,9 @@
   (web-mode-script-padding 2)
   (web-mode-style-padding 2)
   :init
-  (setq web-mode-engines-alist '(("liquid" . "\\.html\\'")))
+  (setq web-mode-engines-alist '(("liquid" . "\\.html\\'")
+                                 ("elixir" . "\\.eex\\'")
+                                 ("phoenix" . "\\.heex\\'")))
   :config
   (defun vsp/web-mode-hook ()
     (setq-local display-fill-column-indicator-column 100
