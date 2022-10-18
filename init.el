@@ -271,16 +271,6 @@
   :after dired
   :ensure nil)
 
-(use-package treemacs
-  :bind (:map winum-keymap
-              ("M-0" . treemacs-select-window)
-              :map treemacs-mode-map
-              ([mouse-1] . treemacs-single-click-expand-action))
-  :custom
-  (treemacs-no-png-images t)
-  (treemacs-display-current-project-exclusively t)
-  (treemacs-project-follow-mode t))
-
 (use-package dash-at-point
   :if (eq system-type 'darwin)
   :bind ("C-c d" . dash-at-point))
@@ -369,13 +359,6 @@
 (use-package cider
   :commands cider-jack-in)
 
-(use-package elixir-mode
-  :mode "\\.ex[s]\\'"
-  :hook (elixir-mode . vsp/elixir-mode-hook)
-  :config
-  (defun vsp/elixir-mode-hook ()
-    (add-hook 'before-save-hook 'elixir-format nil t)))
-
 (use-package js
   :ensure nil
   :defer t
@@ -391,7 +374,7 @@
   :custom (css-indent-offset 2))
 
 (use-package web-mode
-  :mode ("\\.html\\'" "\\.erb\\'" "\\.dtl\\'" "\\.h?eex\\'")
+  :mode ("\\.html\\'" "\\.erb\\'" "\\.dtl\\'")
   :hook (web-mode . vsp/web-mode-hook)
   :custom
   (web-mode-code-indent-offset 2)
@@ -461,10 +444,6 @@
 
 ;;; Writing
 
-(custom-theme-set-faces
- 'user
- '(variable-pitch ((t (:family "IBM Plex Sans" :height 180)))))
-
 (use-package org
   :ensure t
   :pin elpa
@@ -506,13 +485,6 @@
 (use-package flyspell-correct
   :bind (:map flyspell-mode-map
               ("C-;" . flyspell-correct-wrapper)))
-
-(use-package guess-language
-  ;; Guess the language that's being used in the sentece.
-  :hook (flyspell-mode . guess-language-mode)
-  :custom
-  (guess-language-languages '(en pt))
-  (guess-language-min-paragraph-length 35))
 
 (use-package esup
   ;; Benchmark Emacs Startup time without ever leaving your Emacs.
