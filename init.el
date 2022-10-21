@@ -279,15 +279,6 @@
   :load-path "/usr/local/share/emacs/site-lisp/cmake/"
   :mode "CMakeLists.txt")
 
-(use-package ninja-mode
-  :load-path "/usr/local/share/emacs/site-lisp/ninja/"
-  :mode "\\.ninja\\'")
-
-(use-package bazel
-  :defer t
-  :hook (bazel-mode . flymake-mode)
-  :mode ("\\.BUILD\\'" . bazel-build-mode))
-
 (use-package yaml-mode
   :mode "\\.yml\\'")
 
