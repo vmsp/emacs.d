@@ -354,10 +354,13 @@
         slime-contribs '(slime-fancy slime-asdf slime-quicklisp)))
 
 (use-package lispy
-  :hook (lisp-mode . lispy-mode))
+  :hook ((lisp-mode emacs-lisp-mode) . lispy-mode))
 
 (use-package cider
   :commands cider-jack-in)
+
+(use-package rainbow-delimiters
+  :hook ((lisp-mode emacs-lisp-mode) . rainbow-delimiters-mode))
 
 (use-package js
   :ensure nil
