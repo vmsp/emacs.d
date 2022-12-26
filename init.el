@@ -1,20 +1,7 @@
 ;;; init.el --- Vitor's .emacs file  -*- lexical-binding: t -*-
 
-;; Make startup faster by reducing the frequency of garbage collection. The
-;; default is 800 kilobytes. Measured in bytes.
-(setq gc-cons-threshold (* 50 1000 1000))
-
 ;; Set my name. Used by org export and mail packages.
 (setq user-full-name "Vitor M. de Sousa Pereira")
-
-;; Turn off unneeded GUI things. These settings should be preferably set using
-;; `defaults', as setting them here slows down startup considerably.
-(when (fboundp 'tool-bar-mode)
-  (tool-bar-mode 0))
-(when (fboundp 'scroll-bar-mode)
-  (scroll-bar-mode 0))
-(when (fboundp 'horizontal-scroll-bar-mode)
-  (horizontal-scroll-bar-mode 0))
 
 ;; Archives where packages will be downloaded from.
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -100,10 +87,6 @@
 (global-auto-revert-mode 1)
 (electric-pair-mode 1)
 (blink-cursor-mode 0)
-
-;; Add a bit of fringe so the buffer's contents aren't sticking to the window's
-;; edge.
-(fringe-mode '(4 . 0))
 
 ;; Transparently encrypt and decrypt GnuPG encrypted files.
 (setq epa-pinentry-mode 'loopback)
