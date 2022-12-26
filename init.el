@@ -88,14 +88,6 @@
 (electric-pair-mode 1)
 (blink-cursor-mode 0)
 
-;; Transparently encrypt and decrypt GnuPG encrypted files.
-(setq epa-pinentry-mode 'loopback)
-(epa-file-enable)
-
-;; Make scripts executable as soon they're saved.
-(add-hook 'after-save-hook
-      	  'executable-make-buffer-file-executable-if-script-p)
-
 ;; Set registers, for quick file access.
 (set-register ?i '(file . "~/.emacs.d/init.el"))
 (set-register ?t '(file . "~/.emacs.d/templates"))
@@ -270,7 +262,15 @@
 (use-package sh-script
   :ensure nil
   :defer t
-  :custom (sh-basic-offset 2))
+  :custom (sh-basic-offset 2)
+  :hook (sh-mode . vsp/sh-mode-hook)
+  :init
+  (defun vsp/sh-mode-hook ()
+    ;; Make scripts executable as soon they're saved.
+    (add-hook 'after-save-hook
+              'executable-make-buffer-file-executable-if-script-p
+              0
+              'local)))
 
 (use-package fish-mode
   :mode "\\.fish\\'"
