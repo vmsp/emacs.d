@@ -329,11 +329,11 @@
   (setq inferior-lisp-program "sbcl"
         slime-contribs '(slime-fancy slime-asdf slime-quicklisp)))
 
-(use-package lispy
-  :hook ((lisp-mode emacs-lisp-mode) . lispy-mode))
-
 (use-package cider
   :commands cider-jack-in)
+
+(use-package paredit
+  :hook ((lisp-mode emacs-lisp-mode) . paredit-mode))
 
 (use-package rainbow-delimiters
   :hook ((lisp-mode emacs-lisp-mode) . rainbow-delimiters-mode))
