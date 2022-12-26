@@ -188,8 +188,10 @@
   :ensure nil
   :hook ((prog-mode) . display-fill-column-indicator-mode))
 
-(use-package nord-theme
-  :config (load-theme 'nord t))
+(use-package doom-themes
+  :config
+  (load-theme 'doom-monokai-pro t)
+  (doom-themes-org-config))
 
 (use-package mood-line
   :hook (after-init . mood-line-mode))
