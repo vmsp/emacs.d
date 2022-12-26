@@ -465,24 +465,27 @@
   :bind (:map flyspell-mode-map
               ("C-;" . flyspell-correct-wrapper)))
 
+(use-package ibuffer-vc
+  ;; Group buffers, in ibuffer, by git project root.
+  :hook (ibuffer . vsp/setup-ibuffer-vc)
+  :config
+  (defun vsp/setup-ibuffer-vc ()
+    (ibuffer-vc-set-filter-groups-by-vc-root)
+    (unless (eq ibuffer-sorting-mode 'alphabetic)
+      (ibuffer-do-sort-by-alphabetic))))
+
 (use-package esup
   ;; Benchmark Emacs Startup time without ever leaving your Emacs.
   :commands esup
-  :ensure t)
-
-(use-package server
-  ;; Start a server by default so that org-protocol links work. On macOS, only
-  ;; mituharu's fork registers a handler for org-protocol.
-  :ensure nil
-  :config
-  (unless (server-running-p)
-    (server-start)))
-
-;; Make gc pauses faster by decreasing the threshold.
-(setq gc-cons-threshold (* 2 1000 1000))
   :custom
   ;; Work around a bug where esup tries to step into the byte-compiled version
   ;; of `cl-lib', and fails horribly.
   (esup-depth 0))
+
+(use-package gcmh
+  ;; Enforce a sneaky Garbage Collection strategy to minimize GC interference
+  ;; with the activity. During normal use a high GC threshold is set. When
+  ;; idling GC is triggered and a low threshold is set.
+  :config (gcmh-mode 1))
 
 ;;; init.el ends here
