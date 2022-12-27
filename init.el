@@ -308,11 +308,6 @@
 ;; Ignore GCC generate header dependency files.
 (add-to-list 'completion-ignored-extensions ".d")
 
-(use-package clang-format
-  :load-path "/usr/local/opt/llvm/share/emacs/site-lisp/llvm"
-  :bind (:map c++-mode-map
-              ("C-c C-f" . clang-format-buffer)))
-
 (use-package go-mode
   :mode (("\\.go\\'" . go-mode)
          ("go\\.mod\\'" . go-dot-mod-mode))
@@ -394,6 +389,10 @@
               ("C-c C-r" . eglot-rename)
               ("C-c C-f" . eglot-format)
               ("C-c o" . eglot-code-action-organize-imports)))
+
+(use-package apheleia
+  ;; Format on save.
+  :hook (python-mode . apheleia-mode))
 
 ;;; Completion at point UI
 
