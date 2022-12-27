@@ -445,12 +445,23 @@
   (org-startup-indented t)
   (org-startup-folded t))
 
-(use-package markdown-mode
-  :mode "\\.md\\'")
+(use-package org-ql
+  :commands (org-ql-find org-ql-search))
 
-(use-package auto-fill-mode
-  :ensure nil
-  :hook (text-mode . auto-fill-mode))
+(use-package markdown-mode
+  :mode "\\.md\\'"
+  :hook (markdown-mode . olivetti-mode))
+
+(use-package olivetti
+  :commands olivetti-mode
+  :hook ((olivetti-mode . buffer-face-mode)
+         (olivetti-mode . vsp/olivetti-mode-hook))
+  :custom
+  (buffer-face-mode-face '(:family "iA Writer Mono S" :height 150))
+  (olivetti-body-width 54)
+  :config
+  (defun vsp/olivetti-mode-hook ()
+    (setq-local line-spacing 0.5)))
 
 (use-package flyspell
   ;; Portuguese dictionaries can be downloaded at
@@ -458,7 +469,8 @@
   :ensure nil
   :hook ((text-mode . flyspell-mode))
   :custom
-  (ispell-really-aspell t))
+  (ispell-really-aspell t)
+  (flyspell-issue-message-flag nil))
 
 (use-package flyspell-correct
   :bind (:map flyspell-mode-map
