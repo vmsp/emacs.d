@@ -163,6 +163,11 @@
       ns-option-modifier 'none
       ns-pop-up-frames nil)
 
+(use-package exec-path-from-shell
+  :if (memq window-system '(mac ns))
+  :config
+  (exec-path-from-shell-initialize))
+
 (use-package eshell
   :bind ("C-x m" . eshell))
 
