@@ -92,6 +92,21 @@
 (set-register ?i '(file . "~/.emacs.d/init.el"))
 (set-register ?t '(file . "~/.emacs.d/templates"))
 
+(use-package recentf
+  ;; Store a list of recently opened files.
+  :ensure nil
+  :defer 1
+  :bind ("C-x C-r" . vsp/recentf-find-file)
+  :custom
+  (recentf-max-menu-items 50)
+  (recentf-max-saved-items 50)
+  :init
+  (recentf-mode 1)
+  :config
+  (defun vsp/recentf-find-file ()
+    (interactive)
+    (find-file (completing-read "Open recent: " recentf-list nil t))))
+
 (use-package async
   ;; Make dired and byte-compilation asynchronous.
   :defer t
