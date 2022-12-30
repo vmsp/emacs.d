@@ -178,6 +178,11 @@
       ns-option-modifier 'none
       ns-pop-up-frames nil)
 
+;; I kept accidentally triggering these bindings that increase and decrease font
+;; size.
+(global-unset-key (kbd "C-<wheel-up>"))
+(global-unset-key (kbd "C-<wheel-down>"))
+
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
   :config
