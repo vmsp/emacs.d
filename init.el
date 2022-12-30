@@ -313,9 +313,7 @@
   :ensure nil
   :mode "\\.h\\'"
   :bind (:map c++-mode-map
-              ("C-c C-c" . compile)
-              ("C-c C-b" . bazel-build)
-              ("C-c C-r" . bazel-run)))
+              ("C-c C-c" . compile)))
 
 (use-package objc-mode
   :ensure nil
@@ -348,10 +346,12 @@
   :commands cider-jack-in)
 
 (use-package paredit
-  :hook ((lisp-mode emacs-lisp-mode) . paredit-mode))
+  :hook ((cider-repl-mode clojure-mode emacs-lisp-mode lisp-mode)
+         . paredit-mode))
 
 (use-package rainbow-delimiters
-  :hook ((lisp-mode emacs-lisp-mode) . rainbow-delimiters-mode))
+  :hook ((cider-repl-mode clojure-mode emacs-lisp-mode lisp-mode)
+         . rainbow-delimiters-mode))
 
 (use-package js
   :ensure nil
@@ -417,7 +417,7 @@
 ;;; Completion at point UI
 
 (use-package corfu
-  :hook ((prog-mode org-mode) . corfu-mode))
+  :hook ((prog-mode org-mode eshell-mode) . corfu-mode))
 
 ;; Hide commands that don't apply to the current mode.
 (setq read-extended-command-predicate #'command-completion-default-include-p)
@@ -469,12 +469,12 @@
   :commands (org-ql-find org-ql-search))
 
 (use-package markdown-mode
-  :mode "\\.md\\'"
-  :hook (markdown-mode . olivetti-mode))
+  :mode "\\.md\\'")
 
 (use-package olivetti
   :commands olivetti-mode
-  :hook ((olivetti-mode . buffer-face-mode)
+  :hook ((markdown-mode . olivetti-mode)
+         (olivetti-mode . buffer-face-mode)
          (olivetti-mode . vsp/olivetti-mode-hook))
   :custom
   (buffer-face-mode-face '(:family "iA Writer Mono S" :height 150))
