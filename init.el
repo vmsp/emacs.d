@@ -185,6 +185,7 @@
 
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
+  :defer 1
   :config
   (exec-path-from-shell-initialize))
 
@@ -298,8 +299,7 @@
               'local)))
 
 (use-package fish-mode
-  :mode "\\.fish\\'"
-  :custom (fish-indent-offset 2))
+  :mode "\\.fish\\'")
 
 (use-package python
   :mode ("\\.py\\'" . python-mode)
@@ -334,8 +334,7 @@
 (use-package go-mode
   :mode (("\\.go\\'" . go-mode)
          ("go\\.mod\\'" . go-dot-mod-mode))
-  :hook ((go-mode . eglot-ensure)
-         (go-mode . vsp/go-mode-hook))
+  :hook (go-mode . vsp/go-mode-hook)
   :config
   (defun vsp/go-mode-hook ()
     (display-fill-column-indicator-mode 0)))
@@ -351,12 +350,18 @@
   :commands cider-jack-in)
 
 (use-package paredit
-  :hook ((cider-repl-mode clojure-mode emacs-lisp-mode lisp-mode)
-         . paredit-mode))
+  :hook ((cider-repl-mode
+          clojure-mode
+          emacs-lisp-mode
+          lisp-mode
+          slime-repl-mode) . paredit-mode))
 
 (use-package rainbow-delimiters
-  :hook ((cider-repl-mode clojure-mode emacs-lisp-mode lisp-mode)
-         . rainbow-delimiters-mode))
+  :hook ((cider-repl-mode
+          clojure-mode
+          emacs-lisp-mode
+          lisp-mode
+          slime-repl-mode) . rainbow-delimiters-mode))
 
 (use-package js
   :ensure nil
@@ -373,7 +378,7 @@
   :custom (css-indent-offset 2))
 
 (use-package web-mode
-  :mode ("\\.html\\'" "\\.erb\\'" "\\.dtl\\'")
+  :mode ("\\.html\\'" "\\.erb\\'" "\\.jekyll\\'")
   :hook (web-mode . vsp/web-mode-hook)
   :custom
   (web-mode-code-indent-offset 2)
@@ -383,19 +388,20 @@
   (web-mode-script-padding 2)
   (web-mode-style-padding 2)
   :init
-  (setq web-mode-engines-alist '(("liquid" . "\\.html\\'")
-                                 ("elixir" . "\\.eex\\'")
-                                 ("phoenix" . "\\.heex\\'")))
+  (setq web-mode-engines-alist '(("django" . "templates/.*\\.html\\'")
+                                 ("liquid" . "\\.jekyll\\'")))
   :config
+  (defun vsp/web-mode-electric-pair-p (c)
+    "Don't pair curly braces in web-mode as it already has its own
+completions."
+    (if (char-equal c ?{)
+        t
+      (electric-pair-default-inhibit c)))
+
   (defun vsp/web-mode-hook ()
-    (setq-local display-fill-column-indicator-column 100
-                ;; Don't pair curly braces in web-mode as it already has its own
-                ;; completions.
-                electric-pair-inhibit-predicate
-                (lambda (c)
-                  (if (char-equal c ?{)
-                      t
-                    (electric-pair-default-inhibit c))))))
+    (setq-local
+     display-fill-column-indicator-column 100
+     electric-pair-inhibit-predicate 'vsp/web-mode-electric-pair-p)))
 
 (use-package emmet-mode
   :commands emmet-expand-line
@@ -410,6 +416,7 @@
 (use-package eglot
   ;; Language Server Protocol client for Emacs.
   :commands (eglot eglot-ensure)
+  :hook (go-mode . eglot-ensure)
   :bind (:map eglot-mode-map
               ("C-c C-r" . eglot-rename)
               ("C-c C-f" . eglot-format)
@@ -417,7 +424,7 @@
 
 (use-package apheleia
   ;; Format on save.
-  :hook (python-mode . apheleia-mode))
+  :hook ((python-mode fish-mode) . apheleia-mode))
 
 ;;; Completion at point UI
 
