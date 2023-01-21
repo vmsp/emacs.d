@@ -341,7 +341,15 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (use-package python
   :mode ("\\.py\\'" . python-mode)
   :custom
-  (python-fill-docstring-style 'pep-257-nn))
+  (python-fill-docstring-style 'pep-257-nn)
+  :flymake-hook
+  (python-mode flymake-collection-ruff))
+
+(use-package pyvenv
+  :defer t)
+
+(use-package auto-virtualenv
+  :hook (python-mode . auto-virtualenv-set-virtualenv))
 
 (use-package anaconda-mode
   :hook ((python-mode . anaconda-mode)
@@ -461,7 +469,17 @@ completions."
 
 (use-package apheleia
   ;; Format on save.
-  :hook ((python-mode fish-mode) . apheleia-mode))
+  :hook ((python-mode fish-mode) . apheleia-mode)
+  :config
+  (setf (alist-get 'python-mode apheleia-mode-alist)
+        '(isort black)))
+
+(use-package flymake
+  :hook (python-mode . flymake-mode))
+
+(use-package flymake-collection
+  ;; Collection of diagnostic functions (linters and so on) to use with Flymake.
+  :hook (after-init . flymake-collection-hook-setup))
 
 ;;; Completion at point UI
 
