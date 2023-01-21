@@ -239,10 +239,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   ;; Trim whitespace without touching the point.
   :hook (prog-mode . ws-butler-mode))
 
-(use-package display-fill-column-indicator
-  :ensure nil
-  :hook ((prog-mode) . display-fill-column-indicator-mode))
-
 (use-package doom-themes
   :config
   (load-theme 'doom-monokai-pro t)
@@ -379,10 +375,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (use-package go-mode
   :mode (("\\.go\\'" . go-mode)
          ("go\\.mod\\'" . go-dot-mod-mode))
-  :hook (go-mode . vsp/go-mode-hook)
-  :config
-  (defun vsp/go-mode-hook ()
-    (display-fill-column-indicator-mode 0)))
+  :hook (go-mode . vsp/go-mode-hook))
 
 (use-package slime
   :commands slime
@@ -433,7 +426,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (web-mode-script-padding 2)
   (web-mode-style-padding 2)
   :init
-  (setq web-mode-engines-alist '(("django" . "templates/.*\\.html\\'")
+  (setq web-mode-engines-alist '(("jinja" . "templates/.*\\.html\\'")
                                  ("liquid" . "\\.jekyll\\'")))
   :config
   (defun vsp/web-mode-electric-pair-p (c)
@@ -445,7 +438,6 @@ completions."
 
   (defun vsp/web-mode-hook ()
     (setq-local
-     display-fill-column-indicator-column 100
      electric-pair-inhibit-predicate 'vsp/web-mode-electric-pair-p)))
 
 (use-package emmet-mode
