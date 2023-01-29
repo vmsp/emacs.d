@@ -387,19 +387,17 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (use-package cider
   :commands cider-jack-in)
 
-(use-package paredit
-  :hook ((cider-repl-mode
-          clojure-mode
-          emacs-lisp-mode
-          lisp-mode
-          slime-repl-mode) . paredit-mode))
+(defconst vsp/lispy-modes '(cider-repl-mode
+                            clojure-mode
+                            emacs-lisp-mode
+                            lisp-mode
+                            slime-repl-mode))
 
-(use-package rainbow-delimiters
-  :hook ((cider-repl-mode
-          clojure-mode
-          emacs-lisp-mode
-          lisp-mode
-          slime-repl-mode) . rainbow-delimiters-mode))
+(eval `(use-package paredit
+         :hook (,vsp/lispy-modes . paredit-mode)))
+
+(eval `(use-package rainbow-delimiters
+         :hook (,vsp/lispy-modes . rainbow-delimiters-mode)))
 
 (use-package js
   :ensure nil
