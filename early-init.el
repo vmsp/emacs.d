@@ -24,10 +24,6 @@
 (when (fboundp 'horizontal-scroll-bar-mode)
   (horizontal-scroll-bar-mode 0))
 
-;; Add a bit of fringe so the buffer's contents aren't sticking to the window's
-;; edge.
-(fringe-mode '(4 . 0))
-
 ;; `file-name-handler-alist' is consulted on each `require', `load' and other
 ;; path functions. Unsetting it gives us a startup speed up.
 (let ((old-file-name-handler-alist file-name-handler-alist))
