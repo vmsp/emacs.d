@@ -250,7 +250,13 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (use-package mwim
   ;; Make C-a and C-e do what I actually want.
   :bind (("C-a" . mwim-beginning)
-         ("C-e" . mwim-end)))
+         ("C-e" . mwim-end))
+  :custom
+  (mwim-beginning-of-line-function '((t . beginning-of-visual-line)
+                                     (message-mode . message-beginning-of-line)
+                                     (org-mode . org-beginning-of-line)))
+  (mwim-end-of-line-function '((t . end-of-visual-line)
+                               (org-mode . org-end-of-line))))
 
 (use-package whole-line-or-region
   ;; Allows functions to operate on the current line if they would normally
