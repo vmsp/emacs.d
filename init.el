@@ -360,9 +360,13 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (use-package auto-virtualenv
   :hook (python-mode . auto-virtualenv-set-virtualenv))
 
-(use-package anaconda-mode
-  :hook ((python-mode . anaconda-mode)
-         (python-mode . anaconda-eldoc-mode)))
+(use-package ruby-mode
+  :mode ("\\.rb\\'" . ruby-mode)
+  :custom
+  (ruby-align-to-stmt-keywords t))
+
+(use-package ruby-end
+  :hook (ruby-mode . ruby-end-mode))
 
 (use-package lua-mode
   :mode "\\.lua\\'"
@@ -437,7 +441,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (web-mode-script-padding 2)
   (web-mode-style-padding 2)
   :init
-  (setq web-mode-engines-alist '(("jinja" . "templates/.*\\.html\\'")
+  (setq web-mode-engines-alist '(("django" . "templates/.*\\.html\\'")
                                  ("liquid" . "\\.jekyll\\'")))
   :config
   (defun vsp/web-mode-electric-pair-p (c)
