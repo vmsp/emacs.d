@@ -544,14 +544,10 @@ completions."
 (use-package olivetti
   :commands olivetti-mode
   :hook ((markdown-mode . olivetti-mode)
-         (olivetti-mode . buffer-face-mode)
-         (olivetti-mode . vsp/olivetti-mode-hook))
+         (olivetti-mode . buffer-face-mode))
   :custom
   (buffer-face-mode-face '(:family "iA Writer Mono S" :height 150))
-  (olivetti-body-width 54)
-  :config
-  (defun vsp/olivetti-mode-hook ()
-    (setq-local line-spacing 0.5)))
+  (olivetti-body-width 54))
 
 (use-package flyspell
   ;; Portuguese dictionaries can be downloaded at
