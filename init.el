@@ -164,6 +164,12 @@
 
 ;;; Global keybinds. These won't be overriden on any mode.
 
+;; <C-i> and <TAB>, and <C-m> and <RET> are the same character. Binding one
+;; always binds the other. Remaps them to other keys so we can distinguish
+;; between them.
+(keyboard-translate ?\C-i ?\H-i)
+(keyboard-translate ?\C-m ?\H-m)
+
 (bind-key* "C-x C-b" 'ibuffer)
 (bind-key* "C-x TAB" 'imenu)
 (bind-key* "C--" 'undo)
@@ -171,6 +177,7 @@
 (bind-key* "C-x k" 'kill-this-buffer)
 (bind-key* "M-o" 'other-window)
 (bind-key* "C-x o" 'ff-find-other-file)
+(bind-key* "H-i" 'mark-defun)
 
 ;; Use CMD as meta on both Cocoa and Mitsuharu builds. Option is used to insert
 ;; all sorts of characters.
