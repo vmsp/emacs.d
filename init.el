@@ -35,7 +35,8 @@
 (setq initial-major-mode 'fundamental-mode
       initial-scratch-message nil)
 
-(setq-default indent-tabs-mode nil
+(setq-default tab-width 4
+              indent-tabs-mode nil
               ;; Make it so a single space ends a sentence when filling.
               sentence-end-double-space nil
               fill-column 80)
@@ -361,9 +362,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   :hook (python-mode . auto-virtualenv-set-virtualenv))
 
 (use-package ruby-mode
-  :mode ("\\.rb\\'" . ruby-mode)
-  :custom
-  (ruby-align-to-stmt-keywords t))
+  :mode ("\\.rb\\'" . ruby-mode))
 
 (use-package ruby-end
   :hook (ruby-mode . ruby-end-mode))
@@ -391,8 +390,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (use-package go-mode
   :mode (("\\.go\\'" . go-mode)
-         ("go\\.mod\\'" . go-dot-mod-mode))
-  :hook (go-mode . vsp/go-mode-hook))
+         ("go\\.mod\\'" . go-dot-mod-mode)))
 
 (use-package slime
   :commands slime
@@ -465,24 +463,12 @@ completions."
               0
               'local)))
 
-(use-package eglot
-  ;; Language Server Protocol client for Emacs.
-  :commands (eglot eglot-ensure)
-  :hook (go-mode . eglot-ensure)
-  :bind (:map eglot-mode-map
-              ("C-c C-r" . eglot-rename)
-              ("C-c C-f" . eglot-format)
-              ("C-c o" . eglot-code-action-organize-imports)))
-
-(use-package apheleia
-  ;; Format on save.
-  :hook ((python-mode fish-mode) . apheleia-mode)
-  :config
-  (setf (alist-get 'python-mode apheleia-mode-alist)
-        '(isort black)))
-
 (use-package flymake
   :hook (python-mode . flymake-mode))
+
+;; Don't delay showing the error at point in the minibuffer.
+(setf help-at-pt-timer-delay 0.1
+      help-at-pt-display-when-idle '(flymake-diagnostic))
 
 (use-package flymake-collection
   ;; Collection of diagnostic functions (linters and so on) to use with Flymake.
