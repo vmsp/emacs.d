@@ -1,7 +1,19 @@
 ;; -*- mode: lisp -*-
 
-web-mode :condition (string= (file-name-extension (buffer-file-name)) "erb")
+web-mode :when (string= web-mode-minor-engine "erb")
 
-(er "<% " p " %>")
-(pe "<%= " p " %>")
+(er "<% " q " %>")
+(pe "<%= " q " %>")
 (end "<% end %>")
+(if "<% if " p " %>" n> q n "<% end %>" >)
+(else "<% else %>")
+
+web-mode :when (member web-mode-minor-engine '("django" "jinja" "liquid"))
+
+(er "{% " q " %}")
+(pe "{{ " q " }}")
+(block "{% block " p " %}" n> q n "{% endblock %}" >)
+(extends "{% extends \"" q "\" %}")
+(if "{% if " p " %}" n> q n "{% endif %}" >)
+(else "{% else %}")
+(for "{% for " p " in " p " %}" n> q n "{% endfor %}" >)
