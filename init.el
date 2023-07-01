@@ -80,14 +80,15 @@
 (load custom-file t)
 
 ;; Turn on/off some minor modes globally.
+(blink-cursor-mode 0)
+(column-number-mode 1)
+(electric-pair-mode 1)
+(global-auto-revert-mode 1)
+(global-display-fill-column-indicator-mode t)
+(global-subword-mode 1)
 (save-place-mode 1)
 (show-paren-mode 1)
-(column-number-mode 1)
 (winner-mode 1)
-(global-subword-mode 1)
-(global-auto-revert-mode 1)
-(electric-pair-mode 1)
-(blink-cursor-mode 0)
 
 ;; Set registers, for quick file access.
 (set-register ?i '(file . "~/.emacs.d/init.el"))
@@ -99,8 +100,8 @@
   :defer 1
   :bind ("C-x C-r" . vsp/recentf-find-file)
   :custom
-  (recentf-max-menu-items 50)
-  (recentf-max-saved-items 50)
+  (recentf-max-menu-items 10)
+  (recentf-max-saved-items 100)
   :init
   (recentf-mode 1)
   :config
@@ -249,7 +250,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (use-package doom-themes
   :config
-  (load-theme 'doom-monokai-pro t)
+  (load-theme 'doom-spacegrey t)
   (doom-themes-org-config))
 
 (use-package mood-line
