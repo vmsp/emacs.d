@@ -98,14 +98,14 @@
   ;; Store a list of recently opened files.
   :ensure nil
   :defer 1
-  :bind ("C-x C-r" . vsp/recentf-find-file)
+  :bind ("C-x C-r" . v/recentf-find-file)
   :custom
   (recentf-max-menu-items 10)
   (recentf-max-saved-items 100)
   :init
   (recentf-mode 1)
   :config
-  (defun vsp/recentf-find-file ()
+  (defun v/recentf-find-file ()
     (interactive)
     (find-file (completing-read "Open recent: " recentf-list nil t))))
 
@@ -202,7 +202,7 @@
   :ensure nil
   :bind ("C-x m" . eshell)
   :config
-  (defun vsp/prompt-pwd (path max-len)
+  (defun v/prompt-pwd (path max-len)
     "Return a potentially trimmed-down version of the directory PATH, replacing
 parent directories with their initial characters to try to get the character
 length of PATH (sans directory slashes) down to MAX-LEN."
@@ -225,17 +225,17 @@ length of PATH (sans directory slashes) down to MAX-LEN."
               components (cdr components)))
       (concat str (cl-reduce (lambda (a b) (concat a "/" b)) components))))
 
-  (defun vsp/with-face (str &rest face-plist)
+  (defun v/with-face (str &rest face-plist)
     (propertize str 'face face-plist))
 
-  (defun vsp/eshell-prompt-function ()
+  (defun v/eshell-prompt-function ()
     (concat
-     (vsp/with-face
-      (vsp/prompt-pwd (eshell/pwd) 1) :foreground (doom-color 'green))
-     (vsp/with-face " ❱" :foreground (doom-color 'red))
-     (vsp/with-face " " :foreground (doom-color 'fg))))
+     (v/with-face
+      (v/prompt-pwd (eshell/pwd) 1) :foreground (doom-color 'green))
+     (v/with-face " ❱" :foreground (doom-color 'red))
+     (v/with-face " " :foreground (doom-color 'fg))))
 
-  (setq eshell-prompt-function 'vsp/eshell-prompt-function
+  (setq eshell-prompt-function 'v/eshell-prompt-function
         eshell-highlight-prompt nil))
 
 (use-package project
@@ -244,14 +244,22 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   :bind (("M-RET" . project-find-file)
          ("M-s s" . project-find-regexp)))
 
+(use-package ibuffer-vc
+  ;; Group buffers, in ibuffer, by git project root.
+  :hook (ibuffer . v/setup-ibuffer-vc)
+  :config
+  (defun v/setup-ibuffer-vc ()
+    (ibuffer-vc-set-filter-groups-by-vc-root)
+    (unless (eq ibuffer-sorting-mode 'alphabetic)
+      (ibuffer-do-sort-by-alphabetic))))
+
 (use-package ws-butler
   ;; Trim whitespace without touching the point.
   :hook (prog-mode . ws-butler-mode))
 
-(use-package doom-themes
+(use-package gruvbox-theme
   :config
-  (load-theme 'doom-spacegrey t)
-  (doom-themes-org-config))
+  (load-theme 'gruvbox t))
 
 (use-package mood-line
   :hook (after-init . mood-line-mode))
@@ -322,6 +330,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   :after dired
   :ensure nil)
 
+;;; Programming
+
 (use-package dash-at-point
   :if (eq system-type 'darwin)
   :bind ("C-c d" . dash-at-point))
@@ -337,9 +347,9 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   :ensure nil
   :defer t
   :custom (sh-basic-offset 2)
-  :hook (sh-mode . vsp/sh-mode-hook)
+  :hook (sh-mode . v/sh-mode-hook)
   :init
-  (defun vsp/sh-mode-hook ()
+  (defun v/sh-mode-hook ()
     ;; Make scripts executable as soon they're saved.
     (add-hook 'after-save-hook
               'executable-make-buffer-file-executable-if-script-p
@@ -363,7 +373,9 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   :hook (python-mode . auto-virtualenv-set-virtualenv))
 
 (use-package ruby-mode
-  :mode ("\\.rb\\'" . ruby-mode))
+  :mode ("\\.rb\\'" . ruby-mode)
+  :config
+  (add-to-list 'ruby-align-to-stmt-keywords 'if))
 
 (use-package ruby-end
   :hook (ruby-mode . ruby-end-mode))
@@ -403,17 +415,17 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (use-package cider
   :commands cider-jack-in)
 
-(defconst vsp/lispy-modes '(cider-repl-mode
-                            clojure-mode
-                            emacs-lisp-mode
-                            lisp-mode
-                            slime-repl-mode))
+(defconst v/lispy-modes '(cider-repl-mode
+                          clojure-mode
+                          emacs-lisp-mode
+                          lisp-mode
+                          slime-repl-mode))
 
 (eval `(use-package paredit
-         :hook (,vsp/lispy-modes . paredit-mode)))
+         :hook (,v/lispy-modes . paredit-mode)))
 
 (eval `(use-package rainbow-delimiters
-         :hook (,vsp/lispy-modes . rainbow-delimiters-mode)))
+         :hook (,v/lispy-modes . rainbow-delimiters-mode)))
 
 (use-package js
   :ensure nil
@@ -431,7 +443,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (use-package web-mode
   :mode ("\\.html\\'" "\\.erb\\'" "\\.jekyll\\'")
-  :hook (web-mode . vsp/web-mode-hook)
+  :hook (web-mode . v/web-mode-hook)
   :custom
   (web-mode-code-indent-offset 2)
   (web-mode-comment-style 2)
@@ -443,22 +455,22 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (setq web-mode-engines-alist '(("django" . "templates/.*\\.html\\'")
                                  ("liquid" . "\\.jekyll\\'")))
   :config
-  (defun vsp/web-mode-electric-pair-p (c)
+  (defun v/web-mode-electric-pair-p (c)
     "Don't pair curly braces in web-mode as it already has its own
 completions."
     (if (char-equal c ?{)
         t
       (electric-pair-default-inhibit c)))
 
-  (defun vsp/web-mode-hook ()
+  (defun v/web-mode-hook ()
     (setq-local
-     electric-pair-inhibit-predicate 'vsp/web-mode-electric-pair-p)))
+     electric-pair-inhibit-predicate 'v/web-mode-electric-pair-p)))
 
 (use-package emmet-mode
   :commands emmet-expand-line
-  :hook (web-mode . vsp/emmet-setup-capf)
+  :hook (web-mode . v/emmet-setup-capf)
   :init
-  (defun vsp/emmet-setup-capf ()
+  (defun v/emmet-setup-capf ()
     (add-hook 'completion-at-point-functions
               (lambda () (emmet-expand-line nil))
               0
@@ -495,10 +507,10 @@ completions."
          ("TAB" . tempel-next)
          ("S-TAB" . tempel-previous)
          ("C-g" . tempel-done))
-  :hook ((prog-mode text-mode) . vsp/tempel-setup-capf)
+  :hook ((prog-mode text-mode) . v/tempel-setup-capf)
   :init
   ;; Setup completion at point.
-  (defun vsp/tempel-setup-capf ()
+  (defun v/tempel-setup-capf ()
     (add-hook 'completion-at-point-functions #'tempel-expand -1 'local)))
 
 ;;; Writing
@@ -553,14 +565,7 @@ completions."
   :bind (:map flyspell-mode-map
               ("C-;" . flyspell-correct-wrapper)))
 
-(use-package ibuffer-vc
-  ;; Group buffers, in ibuffer, by git project root.
-  :hook (ibuffer . vsp/setup-ibuffer-vc)
-  :config
-  (defun vsp/setup-ibuffer-vc ()
-    (ibuffer-vc-set-filter-groups-by-vc-root)
-    (unless (eq ibuffer-sorting-mode 'alphabetic)
-      (ibuffer-do-sort-by-alphabetic))))
+;;; Other
 
 (use-package esup
   ;; Benchmark Emacs Startup time without ever leaving your Emacs.
