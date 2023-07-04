@@ -535,22 +535,20 @@ completions."
   (org-export-time-stamp-file nil)
   (org-html-doctype "html5")
   (org-html-validation-link nil)
-  (org-startup-indented t)
+  ;; (org-startup-indented t)
   (org-startup-folded t))
 
 (use-package org-ql
   :commands (org-ql-find org-ql-search))
 
 (use-package markdown-mode
-  :mode "\\.md\\'")
+  :mode "\\.md\\'"
+  :hook (markdown-mode . visual-line-mode))
 
-(use-package olivetti
-  :commands olivetti-mode
-  :hook ((markdown-mode . olivetti-mode)
-         (olivetti-mode . buffer-face-mode))
+(use-package visual-fill-column
+  :hook (markdown-mode . visual-fill-column-mode)
   :custom
-  (buffer-face-mode-face '(:family "iA Writer Mono S" :height 150))
-  (olivetti-body-width 54))
+  (visual-fill-column-center-text t))
 
 (use-package flyspell
   ;; Portuguese dictionaries can be downloaded at
