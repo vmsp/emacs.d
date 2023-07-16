@@ -3,14 +3,19 @@
 ;; Set my name. Used by org export and mail packages.
 (setq user-full-name "Vitor M. de Sousa Pereira")
 
-;; Archives where packages will be downloaded from.
+;; Configure archives where packages will be downloaded from and initialize
+;; package.el
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")
+                         ("gnu" . "https://elpa.gnu.org/packages/")
                          ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
 
-;;; Install use-package. It will load up all other packages.
+(setq package-archive-priorities '(("melpa" . 300)
+                                   ("gnu" . 200)
+                                   ("nongnu" . 100)))
 
 (package-initialize)
+
+;;; Install use-package. It will load up all other packages.
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -84,7 +89,6 @@
 (column-number-mode 1)
 (electric-pair-mode 1)
 (global-auto-revert-mode 1)
-(global-display-fill-column-indicator-mode t)
 (global-subword-mode 1)
 (save-place-mode 1)
 (show-paren-mode 1)
@@ -198,6 +202,9 @@
   :config
   (exec-path-from-shell-initialize))
 
+(use-package display-fill-column-indicator
+  :hook (prog-mode . display-fill-column-indicator-mode))
+
 (use-package eshell
   :ensure nil
   :bind ("C-x m" . eshell)
@@ -230,10 +237,9 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
   (defun v/eshell-prompt-function ()
     (concat
-     (v/with-face
-      (v/prompt-pwd (eshell/pwd) 1) :foreground (doom-color 'green))
-     (v/with-face " ❱" :foreground (doom-color 'red))
-     (v/with-face " " :foreground (doom-color 'fg))))
+     (v/with-face (v/prompt-pwd (eshell/pwd) 1) :foreground "#b8bb26")
+     (v/with-face " ❱" :foreground "#fb4934")
+     (v/with-face " " :foreground "#ebdbb2")))
 
   (setq eshell-prompt-function 'v/eshell-prompt-function
         eshell-highlight-prompt nil))
@@ -241,8 +247,8 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (use-package project
   ;; Emacs' built-in projectile-ish mode. Default prefix is C-x p.
   :ensure nil
-  :bind (("M-RET" . project-find-file)
-         ("M-s s" . project-find-regexp)))
+  :bind* (("M-RET" . project-find-file)
+          ("M-s s" . project-find-regexp)))
 
 (use-package ibuffer-vc
   ;; Group buffers, in ibuffer, by git project root.
@@ -357,7 +363,11 @@ length of PATH (sans directory slashes) down to MAX-LEN."
               'local)))
 
 (use-package fish-mode
-  :mode "\\.fish\\'")
+  :mode "\\.fish\\'"
+  :hook (fish-mode . v/fish-mode-hook)
+  :config
+  (defun v/fish-mode-hook ()
+    (add-hook 'before-save-hook 'fish_indent-before-save 0 'local)))
 
 (use-package python
   :mode ("\\.py\\'" . python-mode)
@@ -464,7 +474,8 @@ completions."
 
   (defun v/web-mode-hook ()
     (setq-local
-     electric-pair-inhibit-predicate 'v/web-mode-electric-pair-p)))
+     electric-pair-inhibit-predicate 'v/web-mode-electric-pair-p)
+    (display-fill-column-indicator-mode 0)))
 
 (use-package emmet-mode
   :commands emmet-expand-line
@@ -517,17 +528,17 @@ completions."
 
 (use-package org
   :ensure t
-  :pin elpa
   :mode ("\\.org\\'" . org-mode)
   :bind (("C-c l" . org-store-link)
          ("C-c a" . org-agenda)
          ("C-c c" . org-capture)
          :map org-mode-map
          ("C-c b" . org-cite-insert))
+  :hook (org-mode . visual-line-mode)
   :custom
   (org-agenda-files '("~/Documents/Agenda.org"))
   (org-capture-templates
-   '(("f" "Favorito" entry (file "~/Documents/Favoritos.org")
+   '(("f" "Fav" entry (file "~/Documents/Fav.org")
       "\n* TODO %:annotation%?\n:PROPERTIES:\n:ADDED: %U\n:END:\n\n"
       :prepend t)
      ("s" "Scratch" entry (file "~/Documents/Scratch.org")
@@ -546,9 +557,7 @@ completions."
   :hook (markdown-mode . visual-line-mode))
 
 (use-package visual-fill-column
-  :hook (markdown-mode . visual-fill-column-mode)
-  :custom
-  (visual-fill-column-center-text t))
+  :hook (visual-line-mode . visual-fill-column-mode))
 
 (use-package flyspell
   ;; Portuguese dictionaries can be downloaded at
