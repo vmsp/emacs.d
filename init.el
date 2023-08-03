@@ -86,6 +86,7 @@
 (save-place-mode 1)
 (show-paren-mode 1)
 (winner-mode 1)
+(pixel-scroll-precision-mode 1)
 
 ;; Set registers, for quick file access.
 (set-register ?i '(file . "~/.emacs.d/init.el"))
