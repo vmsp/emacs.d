@@ -17,13 +17,6 @@
 
 ;;; Install use-package. It will load up all other packages.
 
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-(eval-when-compile
-  (require 'use-package))
-(require 'bind-key)
-
 ;; Download all packages declared with use-package by default. Emacs' packages
 ;; must set `:ensure nil`.
 (require 'use-package-ensure)
