@@ -332,6 +332,21 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 ;;; Programming
 
+(setq treesit-language-source-alist
+      '((javascript "https://github.com/tree-sitter/tree-sitter-javascript")
+        (tsx "https://github.com/tree-sitter/tree-sitter-typescript"
+             "master"
+             "tsx/src")
+        (typescript "https://github.com/tree-sitter/tree-sitter-typescript"
+                    "master"
+                    "typescript/src")))
+
+(defun v/install-tree-sitter-grammar (name)
+  (unless (treesit-language-available-p name)
+    (treesit-install-language-grammar name)))
+
+(mapc 'v/install-tree-sitter-grammar (map-keys treesit-language-source-alist))
+
 (use-package dash-at-point
   :if (eq system-type 'darwin)
   :bind ("C-c d" . dash-at-point))
@@ -431,14 +446,16 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (eval `(use-package rainbow-delimiters
          :hook (,v/lispy-modes . rainbow-delimiters-mode)))
 
-(use-package js
+(use-package js-ts-mode
   :ensure nil
-  :defer t
-  :mode (("\\.js\\'" . js-mode)
-         ("\\.json\\'" . js-mode))
+  :mode ("\\.js\\'" "\\.json\\'")
   :custom
   (js-expr-indent-offset 2)
   (js-indent-level 2))
+
+(use-package typescript-ts-mode
+  :ensure nil
+  :mode "\\.tsx?\\'")
 
 (use-package css-mode
   :ensure nil
