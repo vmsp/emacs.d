@@ -351,6 +351,17 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   :if (eq system-type 'darwin)
   :bind ("C-c d" . dash-at-point))
 
+(use-package flymake
+  :hook (python-mode . flymake-mode))
+
+;; Don't delay showing the error at point in the minibuffer.
+(setf help-at-pt-timer-delay 0.1
+      help-at-pt-display-when-idle '(flymake-diagnostic))
+
+(use-package flymake-collection
+  ;; Collection of diagnostic functions (linters and so on) to use with Flymake.
+  :hook (after-init . flymake-collection-hook-setup))
+
 (use-package cmake-mode
   :load-path "/usr/local/share/emacs/site-lisp/cmake/"
   :mode "CMakeLists.txt")
@@ -497,17 +508,6 @@ completions."
               (lambda () (emmet-expand-line nil))
               0
               'local)))
-
-(use-package flymake
-  :hook (python-mode . flymake-mode))
-
-;; Don't delay showing the error at point in the minibuffer.
-(setf help-at-pt-timer-delay 0.1
-      help-at-pt-display-when-idle '(flymake-diagnostic))
-
-(use-package flymake-collection
-  ;; Collection of diagnostic functions (linters and so on) to use with Flymake.
-  :hook (after-init . flymake-collection-hook-setup))
 
 ;;; Completion at point UI
 

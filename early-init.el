@@ -1,7 +1,7 @@
 ;;; early-init.el --- Executes before init.el  -*- lexical-binding: t -*-
 
-;; Turn off GC.
-(setq gc-cons-threshold most-positive-fixnum)
+;; Turn off GC when initializing. It must be re-enabled at the end of init.el.
+(setq gc-cons-threshold #x40000000)
 
 ;; (package-initialize) is called later, so don't load up packages by default.
 (setq package-enable-at-startup nil)
