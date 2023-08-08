@@ -369,6 +369,10 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (use-package yaml-mode
   :mode "\\.yml\\'")
 
+(use-package caddyfile-mode
+  :mode (("Caddyfile\\'" . caddyfile-mode)
+         ("caddy\\.conf\\'" . caddyfile-mode)))
+
 (use-package sh-script
   :ensure nil
   :defer t
