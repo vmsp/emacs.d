@@ -15,11 +15,8 @@
 
 (package-initialize)
 
-;;; Install use-package. It will load up all other packages.
-
 ;; Download all packages declared with use-package by default. Emacs' packages
 ;; must set `:ensure nil`.
-(require 'use-package-ensure)
 (setq use-package-always-ensure t)
 
 ;; Native compile packages as part of their installation.
@@ -241,8 +238,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (use-package project
   ;; Emacs' built-in projectile-ish mode. Default prefix is C-x p.
   :ensure nil
-  :bind* (("M-RET" . project-find-file)
-          ("M-s s" . project-find-regexp)))
+  :bind* (("M-RET" . project-find-file)))
 
 (use-package ibuffer-vc
   ;; Group buffers, in ibuffer, by git project root.
@@ -345,8 +341,6 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (unless (treesit-language-available-p name)
     (treesit-install-language-grammar name)))
 
-(mapc 'v/install-tree-sitter-grammar (map-keys treesit-language-source-alist))
-
 (use-package dash-at-point
   :if (eq system-type 'darwin)
   :bind ("C-c d" . dash-at-point))
@@ -370,15 +364,14 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   :mode "\\.yml\\'")
 
 (use-package caddyfile-mode
-  :mode (("Caddyfile\\'" . caddyfile-mode)
-         ("caddy\\.conf\\'" . caddyfile-mode)))
+  :mode ("Caddyfile\\'" "caddy\\.conf\\'"))
 
 (use-package sh-script
   :ensure nil
   :defer t
   :custom (sh-basic-offset 2)
   :hook (sh-mode . v/sh-mode-hook)
-  :init
+  :config
   (defun v/sh-mode-hook ()
     ;; Make scripts executable as soon they're saved.
     (add-hook 'after-save-hook
@@ -466,11 +459,16 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   :mode ("\\.js\\'" "\\.json\\'")
   :custom
   (js-expr-indent-offset 2)
-  (js-indent-level 2))
+  (js-indent-level 2)
+  :config
+  (v/install-tree-sitter-grammar 'javascript))
 
 (use-package typescript-ts-mode
   :ensure nil
-  :mode "\\.tsx?\\'")
+  :mode "\\.tsx?\\'"
+  :config
+  (v/install-tree-sitter-grammar 'tsx)
+  (v/install-tree-sitter-grammar 'typescript))
 
 (use-package css-mode
   :ensure nil
