@@ -1,4 +1,6 @@
-;; -*- mode: lisp -*-
+python-mode
+
+(bp "breakpoint()")
 
 web-mode :when (string= web-mode-minor-engine "erb")
 
@@ -17,3 +19,8 @@ web-mode :when (member web-mode-minor-engine '("django" "jinja" "liquid"))
 (if "{% if " p " %}" n> q n "{% endif %}" >)
 (else "{% else %}")
 (for "{% for " p " in " p " %}" n> q n "{% endfor %}" >)
+
+;; Local Variables:
+;; mode: lisp-data
+;; outline-regexp: "[a-z]"
+;; End:

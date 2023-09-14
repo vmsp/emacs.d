@@ -188,7 +188,7 @@
 (global-unset-key (kbd "C-<wheel-down>"))
 
 (use-package exec-path-from-shell
-  :if (memq window-system '(mac ns))
+  :if (and (memq window-system '(mac ns)) (not (boundp 'ns-system-appearance)))
   :defer 1
   :config
   (exec-path-from-shell-initialize))
@@ -326,6 +326,11 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   :after dired
   :ensure nil)
 
+(defun v/open-in-finder ()
+  "Reveal the currently shown file in Finder."
+  (interactive)
+  (shell-command (concat "open -R " (buffer-file-name))))
+
 ;;; Programming
 
 (setq treesit-language-source-alist
@@ -341,12 +346,21 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (unless (treesit-language-available-p name)
     (treesit-install-language-grammar name)))
 
+(defun v/project-recompile ()
+  "Run `recompile' in the project root."
+  (interactive)
+  (let ((default-directory (project-root (project-current t)))
+        (compilation-buffer-name-function
+         (or project-compilation-buffer-name-function
+             compilation-buffer-name-function)))
+    (recompile)))
+
 (use-package dash-at-point
   :if (eq system-type 'darwin)
   :bind ("C-c d" . dash-at-point))
 
-(use-package flymake
-  :hook (python-mode . flymake-mode))
+;; (use-package flymake
+;;   :hook (python-mode . flymake-mode))
 
 ;; Don't delay showing the error at point in the minibuffer.
 (setf help-at-pt-timer-delay 0.1
@@ -355,6 +369,21 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 (use-package flymake-collection
   ;; Collection of diagnostic functions (linters and so on) to use with Flymake.
   :hook (after-init . flymake-collection-hook-setup))
+
+(use-package eglot
+  :ensure nil
+  :defer t
+  :bind (:map eglot-mode-map
+              ("C-c C-r" . eglot-rename)
+              ("C-c C-f" . eglot-format))
+  :hook ((eglot-mode . eldoc-mode)
+         (eglot-mode . flymake-mode)))
+
+(use-package make-mode
+  :ensure nil
+  :commands makefile-gmake-mode
+  :mode (("Makefile"  . makefile-gmake-mode)
+         ("\\.mk\\'" . makefile-gmake-mode)))
 
 (use-package cmake-mode
   :load-path "/usr/local/share/emacs/site-lisp/cmake/"
@@ -388,21 +417,12 @@ length of PATH (sans directory slashes) down to MAX-LEN."
 
 (use-package python
   :mode ("\\.py\\'" . python-mode)
+  :hook (python-mode . eglot-ensure)
   :custom
-  (python-fill-docstring-style 'pep-257-nn)
-  :flymake-hook
-  (python-mode flymake-collection-ruff))
-
-(use-package pyvenv
-  :defer t)
-
-(use-package auto-virtualenv
-  :hook (python-mode . auto-virtualenv-set-virtualenv))
+  (python-fill-docstring-style 'pep-257-nn))
 
 (use-package ruby-mode
-  :mode ("\\.rb\\'" . ruby-mode)
-  :config
-  (add-to-list 'ruby-align-to-stmt-keywords 'if))
+  :mode ("\\.rb\\'" . ruby-mode))
 
 (use-package ruby-end
   :hook (ruby-mode . ruby-end-mode))
@@ -411,11 +431,11 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   :mode "\\.lua\\'"
   :custom (lua-indent-level 2))
 
-(use-package c++-mode
+(use-package cc-mode
   :ensure nil
-  :mode "\\.h\\'"
+  :mode ("\\.h\\'" . c++-mode)
   :bind (:map c++-mode-map
-              ("C-c C-c" . compile)))
+         ("C-c C-c" . v/project-recompile)))
 
 (use-package objc-mode
   :ensure nil
@@ -425,28 +445,33 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   :load-path "~/.emacs.d/vendor/"
   :hook (c-mode-common . google-set-c-style))
 
+(use-package php-mode
+  :mode "\\.php\\'")
+
 ;; Ignore GCC generate header dependency files.
 (add-to-list 'completion-ignored-extensions ".d")
 
 (use-package go-mode
   :mode (("\\.go\\'" . go-mode)
-         ("go\\.mod\\'" . go-dot-mod-mode)))
-
-(use-package slime
-  :commands slime
-  :hook (common-lisp-mode . slime-mode)
-  :init
-  (setq inferior-lisp-program "sbcl"
-        slime-contribs '(slime-fancy slime-asdf slime-quicklisp)))
+         ("go\\.mod\\'" . go-dot-mod-mode))
+  :hook (go-mode . eglot-ensure))
 
 (use-package cider
-  :commands cider-jack-in)
+  :commands (cider-jack-in-clj cider-jack-in-cljs cider-jack-in-clj&cljs)
+  :bind (:map clojure-mode-map
+         ("C-c c" . v/cider-reset)
+         :map cider-mode-map
+         ("C-c C-f" . cider-format-buffer))
+  :config
+  (defun v/cider-reset ()
+    (interactive)
+    (cider-insert-in-repl "(reset)" t)))
 
 (defconst v/lispy-modes '(cider-repl-mode
                           clojure-mode
                           emacs-lisp-mode
                           lisp-mode
-                          slime-repl-mode))
+                          lisp-data-mode))
 
 (eval `(use-package paredit
          :hook (,v/lispy-modes . paredit-mode)))
@@ -470,13 +495,22 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (v/install-tree-sitter-grammar 'tsx)
   (v/install-tree-sitter-grammar 'typescript))
 
+(use-package nvm
+  :commands (nvm-use-for)
+  :custom
+  (nvm-dir "~/.local/share/nvm/")
+  :init
+  (defun v/nvm ()
+    (interactive)
+    (nvm-use-for)))
+
 (use-package css-mode
   :ensure nil
   :defer t
   :custom (css-indent-offset 2))
 
 (use-package web-mode
-  :mode ("\\.html\\'" "\\.erb\\'" "\\.jekyll\\'")
+  :mode ("\\.html\\'" "\\.erb\\'")
   :hook (web-mode . v/web-mode-hook)
   :custom
   (web-mode-code-indent-offset 2)
@@ -487,7 +521,7 @@ length of PATH (sans directory slashes) down to MAX-LEN."
   (web-mode-style-padding 2)
   :init
   (setq web-mode-engines-alist '(("django" . "templates/.*\\.html\\'")
-                                 ("liquid" . "\\.jekyll\\'")))
+                                 ("liquid" . "0x1.pt/.*\\.html\\'")))
   :config
   (defun v/web-mode-electric-pair-p (c)
     "Don't pair curly braces in web-mode as it already has its own
@@ -559,7 +593,7 @@ completions."
   (org-export-time-stamp-file nil)
   (org-html-doctype "html5")
   (org-html-validation-link nil)
-  ;; (org-startup-indented t)
+  (org-startup-indented t)
   (org-startup-folded t))
 
 (use-package org-ql
